@@ -4,7 +4,8 @@ import { cards } from "./consts";
 import { useState } from "react";
 
 function App() {
-  const [isShuffling, setIsShuffling] = useState(false);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
 
   const getRandomCard = async () => {
     const url = "https://tarotapi.dev/api/v1/cards/random?n=1";
@@ -17,21 +18,13 @@ function App() {
     enabled: false,
   });
 
-  console.log(data);
-
   const cardSrc = `https://ucarecdn.com/${cards.find((card) => card.name_short === data?.cards[0].name_short)?.id}/-/preview/580x1000/`;
-  const animationTrackerCard = document.getElementById("animated-last");
+  const shuffleTrackerCard = document.getElementById("animated-shuffle");
 
   const handleClick = () => {
     refetch();
-    shuffle();
+    setIsShuffled(true);
   };
-
-  const shuffle = () => {
-    setIsShuffling(true);
-  };
-
-  // add all texts and other elements
 
   // add flip card animation
   // add reversed cards
@@ -41,33 +34,24 @@ function App() {
 
   // в конце пройтись и всё почистить!
 
-  const renderDivinationText = () => {
-    if (!isShuffling && data) {
-      return (
-        <>
-          {/* <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-[7]">
-             <img
-              src={cardSrc}
-              alt=""
-              className="rounded-3xl max-h-80 shadow-xl "
-            /> 
-          </div>*/}
-          <div className="flex flex-col gap-4 pt-10 max-w-2xl lg:max-w-5xl">
-            <h2 className="text-textMain text-2xl md:text-3xl lg:text-4xl text-center">
-              {data.cards[0].name}
-            </h2>
+  const renderDivinationText = () => (
+    <>
+      <div className="flex flex-col gap-4 pt-10 max-w-2xl lg:max-w-5xl">
+        <h2 className="text-textMain text-2xl md:text-3xl lg:text-4xl text-center">
+          {data.cards[0].name}
+        </h2>
 
-            <p className="text-textMain text-lg md:text-xl lg:text-2xl font-light text-center">
-              {data.cards[0].meaning_up}
-            </p>
-          </div>
-        </>
-      );
-    }
-  };
+        <p className="text-textMain text-lg md:text-xl lg:text-2xl font-light text-center">
+          {data.cards[0].meaning_up}
+        </p>
+      </div>
+    </>
+  );
 
-  animationTrackerCard?.addEventListener("animationend", () => {
-    setIsShuffling(false);
+  shuffleTrackerCard?.addEventListener("animationend", () => {
+    setTimeout(() => {
+      setIsFlipped(true);
+    }, 1000);
   });
 
   return (
@@ -84,7 +68,7 @@ function App() {
             <img
               src="/back.jpeg"
               alt=""
-              className={`relative rounded-3xl max-h-80 md:max-h-96 lg:max-h-[468px] shadow-sm  ${isShuffling ? " animate-shuffle ease-in-out delay-0 duration-500 z-[2]" : "z-[6]"}`}
+              className={`relative rounded-3xl max-h-80 md:max-h-96 lg:max-h-[468px] shadow-sm  ${isShuffled ? " animate-shuffle ease-in-out delay-0 duration-500 z-[2]" : "z-[6]"}`}
               style={{
                 animationDelay: "0s",
                 transition: "z-index 0s ease-in-out 0.5s",
@@ -93,7 +77,7 @@ function App() {
             <img
               src="/back.jpeg"
               alt=""
-              className={`absolute top-0 left-0 rounded-3xl  max-h-80 md:max-h-96 lg:max-h-[468px] shadow-sm mt-2 ${isShuffling ? "animate-shuffle ease-in-out delay-1000 duration-500 z-[1]" : "z-[5]"}`}
+              className={`absolute top-0 left-0 rounded-3xl  max-h-80 md:max-h-96 lg:max-h-[468px] shadow-sm mt-2 ${isShuffled ? "animate-shuffle ease-in-out delay-1000 duration-500 z-[1]" : "z-[5]"}`}
               style={{
                 animationDelay: "1s",
                 transition: "z-index 0s ease-in-out 1.5s",
@@ -102,20 +86,32 @@ function App() {
             <img
               src="/back.jpeg"
               alt=""
-              id="animated-last"
-              className={`absolute top-0 left-0 rounded-3xl  max-h-80 md:max-h-96 lg:max-h-[468px] shadow-sm mt-3 ${isShuffling ? "animate-shuffle ease-in-out delay-2000 duration-500 z-0" : "z-[4]"}`}
+              id="animated-shuffle"
+              className={`absolute top-0 left-0 rounded-3xl  max-h-80 md:max-h-96 lg:max-h-[468px] shadow-sm mt-3 ${isShuffled ? "animate-shuffle ease-in-out delay-2000 duration-500 z-0" : "z-[4]"}`}
               style={{
                 animationDelay: "2s",
                 transition: "z-index 0s ease-in-out 2.5s",
               }}
             />
-            {isFetched && !isShuffling && (
+            <div
+              className="absolute inset-0 w-full h-full transition-transform ease-in-out delay-100 duration-500 [transformStyle:preserve-3d] z-[3] "
+              style={{
+                transform: isFlipped ? "rotateY( 180deg )" : "rotateY(0)",
+              }}
+            >
               <img
-                src={cardSrc}
+                src="/back.jpeg"
                 alt=""
-                className="absolute top-0 left-0 rounded-3xl max-h-80 md:max-h-96 lg:max-h-[468px] shadow-xl z-[7]"
+                className="absolute top-0 left-0 rounded-3xl  max-h-80 md:max-h-96 lg:max-h-[468px] shadow-xl  [backfaceVisibility:hidden]"
               />
-            )}
+              {isFetched && (
+                <img
+                  src={cardSrc}
+                  alt=""
+                  className="absolute top-0 left-0 rounded-3xl max-h-80 md:max-h-96 lg:max-h-[468px] shadow-xl [backfaceVisibility:hidden] [transform:rotateY(180deg)]"
+                />
+              )}
+            </div>
             <img
               src="/back.jpeg"
               alt=""
@@ -126,10 +122,10 @@ function App() {
         {isLoading && (
           <p className="text-textMain text-center pt-8">
             Getting your daily divination...
-          </p> // а оно мне надо?..
+          </p>
         )}
         {/* {isError && <p>Error: {error}</p>} */}
-        {data && renderDivinationText()}
+        {data && isFlipped && renderDivinationText()}
       </div>
     </div>
   );
