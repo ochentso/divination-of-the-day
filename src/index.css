@@ -9,23 +9,48 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: "Senta";
+  src: url("/SentaSans_Regular.woff2") format("woff2");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Senta";
+  src: url("/SentaSans_Bold.woff2") format("woff2");
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "Senta";
+  src: url("/SentaSans_Light.woff2") format("woff2");
+  font-weight: 300;
+}
+
 * {
   min-width: 0;
 }
 
 :root {
-  font-family: "Evafiya", serif;
+  font-family: "Senta", sans-serif;
   line-height: 1.5;
-  font-weight: 400;
+  /* font-weight: 400; */
 
   /* color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87); */
-  background-color: #2c1f3b;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0 auto;
+
+  background-color: #e0dacd;
+  /* min-width: 320px;
+  min-height: 100vh; */
 }
 
 /* a {
