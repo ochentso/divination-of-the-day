@@ -1,18 +1,19 @@
 // import "./App.css";
 import { useQuery } from "@tanstack/react-query";
 import { cards } from "./consts";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
   const [isShuffled, setIsShuffled] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isReversed, setIsReversed] = useState(false);
 
   const getRandomCard = async () => {
     const url = "https://tarotapi.dev/api/v1/cards/random?n=1";
     return await fetch(url).then((response) => response.json());
   };
 
-  const { data, error, isFetched, isError, isLoading, refetch } = useQuery({
+  const { data, error, isFetched, isSuccess, isLoading, refetch } = useQuery({
     queryKey: ["getRandomCard"],
     queryFn: getRandomCard,
     enabled: false,
@@ -20,17 +21,19 @@ function App() {
 
   const cardSrc = `https://ucarecdn.com/${cards.find((card) => card.name_short === data?.cards[0].name_short)?.id}/-/preview/580x1000/`;
   const shuffleTrackerCard = document.getElementById("animated-shuffle");
+  // const isReversed =
+  //   (Math.round(Math.random() + 1) + data?.cards[0].value_int) % 2 === 0;
+  // console.log(isReversed);
 
   const handleClick = () => {
     refetch();
     setIsShuffled(true);
   };
 
-  // add flip card animation
   // add reversed cards
   // change meta, fauvicon
-  // подумать про загрузку картинки?
-  // big text on top as a modal window - maybe only for small screens
+  // text animation
+  // big text on top as a modal window - maybe only for small screens?
 
   // в конце пройтись и всё почистить!
 
@@ -42,7 +45,7 @@ function App() {
         </h2>
 
         <p className="text-textMain text-lg md:text-xl lg:text-2xl font-light text-center">
-          {data.cards[0].meaning_up}
+          {isReversed ? data.cards[0].meaning_rev : data.cards[0].meaning_up}
         </p>
       </div>
     </>
@@ -53,6 +56,13 @@ function App() {
       setIsFlipped(true);
     }, 1000);
   });
+
+  useEffect(() => {
+    const random =
+      (Math.round(Math.random() + 1) + data?.cards[0].value_int) % 2 === 0;
+    setIsReversed(random);
+    console.log(random);
+  }, [data]);
 
   return (
     <div className="flex flex-col justify-center items-center gap-4 p-9 pt-12 w-full">
@@ -109,6 +119,9 @@ function App() {
                   src={cardSrc}
                   alt=""
                   className="absolute top-0 left-0 rounded-3xl max-h-80 md:max-h-96 lg:max-h-[468px] shadow-xl [backfaceVisibility:hidden] [transform:rotateY(180deg)]"
+                  style={{
+                    transform: isReversed ? "rotateX( 180deg )" : "",
+                  }}
                 />
               )}
             </div>
