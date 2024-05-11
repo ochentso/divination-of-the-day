@@ -4,10 +4,11 @@ import { transform } from "typescript";
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    colors: {
-      textMain: "#303237",
-    },
     extend: {
+      colors: {
+        textMain: "#303237",
+        paperYellow: "#e0dacd",
+      },
       keyframes: {
         shuffle: {
           "0%": {
