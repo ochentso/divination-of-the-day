@@ -1,59 +1,66 @@
 import { useQuery } from "@tanstack/react-query";
 import { cards } from "./consts";
 import { useEffect, useState } from "react";
-import { isToday } from "date-fns";
+import { isEqual, isToday, set } from "date-fns";
 import { createPortal } from "react-dom";
 import HintModal from "./components/HintModal";
 
+const getRandomCard = async () => {
+  const url = "https://tarotapi.dev/api/v1/cards/random?n=1";
+  return await fetch(url).then((response) => response.json());
+};
+
 function App() {
-  const [isShuffled, setIsShuffled] = useState(false);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [isReversed, setIsReversed] = useState(false);
-  const [isHintOpen, setIsHintOpen] = useState(false);
-
-  const getRandomCard = async () => {
-    const url = "https://tarotapi.dev/api/v1/cards/random?n=1";
-    return await fetch(url).then((response) => response.json());
-  };
-
   const { data, error, isFetched, isSuccess, isLoading, refetch } = useQuery({
     queryKey: ["getRandomCard"],
     queryFn: getRandomCard,
     enabled: false,
   });
 
-  const cardSrc = `https://ucarecdn.com/${cards.find((card) => card.name_short === data?.cards[0].name_short)?.id}/-/preview/580x1000/`;
-  const shuffleTrackerCard = document.getElementById("animated-shuffle");
+  let divinationExists = false;
+  const divination = localStorage.getItem("divination");
+  const parsedDivination = divination ? JSON.parse(divination) : null;
+  let cardSrc = `https://ucarecdn.com/${cards.find((card) => card.name_short === data?.cards[0].name_short)?.id}/-/preview/580x1000/`;
 
-  let divinationExists: boolean = false;
-  let existingCardSrc: string = "";
-  const checkExistingDivination = () => {
-    const divination = localStorage.getItem("divination");
-    if (divination) {
-      const parsedDivination = JSON.parse(divination);
-      if (isToday(parsedDivination.date)) {
-        divinationExists = true;
-        existingCardSrc = `https://ucarecdn.com/${cards.find((card) => card.name_short === parsedDivination.cardNameShort)?.id}/-/preview/580x1000/`;
-      }
+  if (divination) {
+    if (isToday(parsedDivination.date)) {
+      // if (isEqual(parsedDivination.date, Date.now())) {
+      divinationExists = true;
+      cardSrc = `https://ucarecdn.com/${cards.find((card) => card.name_short === parsedDivination.cardNameShort)?.id}/-/preview/580x1000/`;
     }
-  };
-  checkExistingDivination();
+  }
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(divinationExists ? true : false);
+  const [isReversed, setIsReversed] = useState(
+    divinationExists ? parsedDivination.isReversed : false,
+  );
+  const [isHintOpen, setIsHintOpen] = useState(false);
+
+  const [canMakePrediction, setCanMakePrediction] = useState(
+    divinationExists ? false : true,
+  );
+
+  const shuffleTrackerCard = document.getElementById("animated-shuffle");
 
   const handleClick = () => {
     if (divinationExists) {
       setIsHintOpen(true);
     } else {
-      refetch();
-      setIsShuffled(true);
+      refetch().then(() => {
+        setIsShuffled(true);
+      });
     }
   };
 
-  // lock divination for a day until midnight:
-  // disable button (prevent default for a click event) when isShuffled is true OR when isShuffled is true add a modal window with a message on click
-  // create a function to track date and time, and set isShuffled to false at midnight
-  // reset everything when isShuffled is false
+  // to test:
+  // 1) ls empty - open app, click -> shuffle, fetch, flip, card+text -> all correctly written in ls
+  // 2) ls not empty, date is today - divination on page load, modal hint on click with no refethcing
+  // 3) ls not empty, date is not today - no divination on page load, shuffle+flip and new divination work as expected
+  // 4) what happens if I open the app at 23:59 and wait for a new day to come?
+  // если в 23:59 уже есть открытая карта, в 12 автоматически не обновится (пока не будет ререндера); но если кликнуть на карту - появится новое предсказание (НО без анимаций - исправить? low prio!)
 
   // change meta, fauvicon
+  // footer with contacts
   // text animation
   // flip animation on page load
   // big text on top as a modal window - maybe only for small screens?
@@ -80,10 +87,11 @@ function App() {
     );
   };
 
-  const renderExistingDivinationText = () => {
+  const renderExistingDivination = () => {
     const existingDivination = JSON.parse(
       localStorage.getItem("divination") as string,
     );
+    console.log("render existing, reversed", isReversed);
     return (
       <>
         <div className="flex flex-col gap-4 pt-10 max-w-2xl lg:max-w-5xl">
@@ -105,6 +113,9 @@ function App() {
     setTimeout(() => {
       setIsFlipped(true);
     }, 1000);
+    setTimeout(() => {
+      setCanMakePrediction(false);
+    }, 1200);
   });
 
   useEffect(() => {
@@ -112,6 +123,7 @@ function App() {
       const randomReversed =
         (Math.round(Math.random() + 1) + data?.cards[0].value_int) % 2 === 0;
       setIsReversed(randomReversed);
+      console.log("reversed", isReversed);
 
       const meaning = randomReversed
         ? data.cards[0].meaning_rev
@@ -129,8 +141,8 @@ function App() {
   }, [data]);
 
   return (
-    <div className="flex flex-col justify-center items-center gap-4 p-9 pt-12 w-full">
-      <h1 className="text-center text-textMain text-3xl md:text-4xl lg:text-6xl">
+    <div className="flex flex-col justify-center items-center gap-3 p-9 pt-12 w-full">
+      <h1 className="text-center text-textMain text-3xl md:text-4xl lg:text-6xl ">
         Your card of the day
       </h1>
       <p className="text-center text-textMain text-xl md:text-2xl lg:text-3xl font-light">
@@ -171,6 +183,7 @@ function App() {
               className="absolute inset-0 w-full h-full transition-transform ease-in-out delay-100 duration-500 [transformStyle:preserve-3d] z-[3] "
               style={{
                 transform: isFlipped ? "rotateY( 180deg )" : "rotateY(0)",
+                zIndex: !canMakePrediction ? 7 : 3,
               }}
             >
               <img
@@ -178,10 +191,11 @@ function App() {
                 alt=""
                 className="absolute top-0 left-0 rounded-3xl  max-h-80 md:max-h-96 lg:max-h-[468px] shadow-xl  [backfaceVisibility:hidden]"
               />
-              {isFetched && (
+              {(isFetched || divinationExists) && (
                 <img
                   src={cardSrc}
                   alt=""
+                  id="cardSrc"
                   className="absolute top-0 left-0 rounded-3xl max-h-80 md:max-h-96 lg:max-h-[468px] shadow-xl [backfaceVisibility:hidden] [transform:rotateY(180deg)]"
                   style={{
                     transform: isReversed ? "rotateX( 180deg )" : "",
@@ -189,21 +203,7 @@ function App() {
                 />
               )}
             </div>
-            {/* flip animation on page load not working */}
-            {divinationExists && (
-              <div
-                className="absolute inset-0 w-full h-full transition-transform ease-in-out delay-1000 duration-500 [transformStyle:preserve-3d] z-[7] "
-                style={{
-                  transform: "rotateY( 180deg )",
-                }}
-              >
-                <img
-                  src={existingCardSrc}
-                  alt=""
-                  className="absolute top-0 left-0 rounded-3xl max-h-80 md:max-h-96 lg:max-h-[468px] shadow-xl [backfaceVisibility:hidden] [transform:rotateY(180deg)]"
-                />
-              </div>
-            )}
+
             <img
               src="/back.jpeg"
               alt=""
@@ -223,7 +223,7 @@ function App() {
         )}
         {/* {isError && <p>Error: {error}</p>} */}
         {data && isFlipped && renderDivinationText()}
-        {!data && divinationExists && renderExistingDivinationText()}
+        {!data && divinationExists && renderExistingDivination()}
       </div>
     </div>
   );
