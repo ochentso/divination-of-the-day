@@ -39,6 +39,12 @@
   font-weight: 700;
 }
 
+@font-face {
+  font-family: "Cormorant";
+  src: url("/Cormorant-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+}
+
 * {
   min-width: 0;
 }
@@ -61,6 +67,7 @@ body {
   margin: 0 auto;
 
   background-color: #e0dacd;
+  scrollbar-color: #c2b8ad #e7e5e1;
   /* min-width: 320px;
   min-height: 100vh; */
   background-color: #e0dacd;

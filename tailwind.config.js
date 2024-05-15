@@ -8,6 +8,11 @@ export default {
       colors: {
         textMain: "#303237",
         paperYellow: "#e0dacd",
+        lightPaper: "#e7e5e1",
+        oldPaper: "#D6CABC",
+        oldPaperHover: "#d2c4b4",
+        oldPaperActive: "#cbbba9",
+        textSecondary: "#856959",
       },
       keyframes: {
         shuffle: {
