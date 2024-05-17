@@ -7,6 +7,7 @@ import HintModal from "./components/HintModal";
 import DetailsModal from "./components/DetailsModal";
 import { MailIcon } from "./components/MailIcon";
 import { LinkIcon } from "./components/LinkIcon";
+import back from "./assets/back.jpeg";
 
 const getRandomCard = async () => {
   const url = "https://tarotapi.dev/api/v1/cards/random?n=1";
@@ -165,7 +166,7 @@ function App() {
           <button type="button" onClick={handleClick}>
             <div className="relative">
               <img
-                src="./assets/back.jpeg"
+                src={back}
                 alt=""
                 className={`relative rounded-3xl max-h-80 md:max-h-96 lg:max-h-72 xl:max-h-[362px] shadow-sm  ${isShuffled ? " animate-shuffle ease-in-out delay-0 duration-500 z-[2]" : "z-[6]"}`}
                 style={{
@@ -174,7 +175,7 @@ function App() {
                 }}
               />
               <img
-                src="./assets/back.jpeg"
+                src={back}
                 alt=""
                 className={`absolute top-0 left-0 rounded-3xl  max-h-80 md:max-h-96 lg:max-h-72 xl:max-h-[362px] shadow-sm mt-2 ${isShuffled ? "animate-shuffle ease-in-out delay-1000 duration-500 z-[1]" : "z-[5]"}`}
                 style={{
@@ -183,7 +184,7 @@ function App() {
                 }}
               />
               <img
-                src="./assets/back.jpeg"
+                src={back}
                 alt=""
                 id="animated-shuffle"
                 className={`absolute top-0 left-0 rounded-3xl  max-h-80 md:max-h-96 lg:max-h-72 xl:max-h-[362px] shadow-sm mt-3 ${isShuffled ? "animate-shuffle ease-in-out delay-2000 duration-500 z-0" : "z-[4]"}`}
@@ -200,7 +201,7 @@ function App() {
                 }}
               >
                 <img
-                  src="./assets/back.jpeg"
+                  src={back}
                   alt=""
                   className="absolute top-0 left-0 rounded-3xl  max-h-80 md:max-h-96 lg:max-h-72 xl:max-h-[362px] shadow-xl  [backfaceVisibility:hidden]"
                 />
@@ -218,7 +219,7 @@ function App() {
               </div>
 
               <img
-                src="./assets/back.jpeg"
+                src={back}
                 alt=""
                 className="absolute top-0 left-0 rounded-3xl  max-h-80 md:max-h-96 lg:max-h-72 xl:max-h-[362px] shadow-[4px_8px_12px_4px_rgba(0,0,0,0.5)] mt-4 z-[-1]"
               />
