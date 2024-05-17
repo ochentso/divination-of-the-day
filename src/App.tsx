@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { cards } from "./consts";
 import { useEffect, useState } from "react";
-import { isEqual, isToday, set } from "date-fns";
+import { format, isBefore, isEqual, isToday, set } from "date-fns";
 import { createPortal } from "react-dom";
 import HintModal from "./components/HintModal";
 import DetailsModal from "./components/DetailsModal";
@@ -27,9 +27,15 @@ function App() {
 
   if (divination) {
     if (isToday(parsedDivination.date)) {
-      // if (isEqual(parsedDivination.date, Date.now())) {
+      // const oneMinutesFromNow = parsedDivination.date + 6000;
+      // if (isBefore(Date.now(), oneMinutesFromNow)) {
+
       divinationExists = true;
       cardSrc = `https://ucarecdn.com/${cards.find((card) => card.name_short === parsedDivination.cardNameShort)?.id}/-/preview/580x1000/`;
+    } else {
+      console.log("update card");
+      localStorage.removeItem("divination");
+      window.location.reload();
     }
   }
   const [isShuffled, setIsShuffled] = useState(false);
@@ -246,20 +252,20 @@ function App() {
               <DetailsModal onClose={() => setIsDetailsOpen(false)} />,
               document.body,
             )}
-          {isLoading && (
+          {/* {isLoading && (
             <p className="text-textMain text-center pt-8">
               Getting your daily divination...
             </p>
-          )}
+          )} */}
           {/* {isError && <p>Error: {error}</p>} */}
           {data && isFlipped && renderDivination()}
           {!data && divinationExists && renderExistingDivination()}
         </div>
       </div>
-      <footer className="flex justify-center gap-4  px-7 md:px-9 ">
+      <footer className="flex grow justify-center items-end gap-4 pb-2 px-7 md:px-9 ">
         <div className="flex gap-1 items-center text-textSecondary text-xs md:text-sm lg:text-base">
           <MailIcon />
-          <span>ochentso@gmail.com</span>
+          <a href="mailto:ochentso@gmail.com">ochentso@gmail.com</a>
         </div>
         <div>
           <a
