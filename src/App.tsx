@@ -244,7 +244,7 @@ function App() {
         </div>
         <div>
           <a
-            href=""
+            href="https://github.com/ochentso"
             target="_blank"
             className="flex gap-1 items-center text-textSecondary text-xs md:text-sm lg:text-base"
           >
