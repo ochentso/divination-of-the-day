@@ -34,7 +34,6 @@ function App() {
       divinationExists = true;
       cardSrc = `https://ucarecdn.com/${cards.find((card) => card.name_short === parsedDivination.cardNameShort)?.id}/-/preview/580x1000/`;
     } else {
-      console.log("update card");
       localStorage.removeItem("divination");
       window.location.reload();
     }
@@ -92,7 +91,6 @@ function App() {
     const existingDivination = JSON.parse(
       localStorage.getItem("divination") as string,
     );
-    console.log("render existing, reversed", isReversed);
     return (
       <>
         <div className="flex flex-col items-center gap-1 lg:gap-3 pt-9 md:pt-11 xl:pt-14 max-w-2xl xl:max-w-5xl">
@@ -131,7 +129,6 @@ function App() {
       const randomReversed =
         (Math.round(Math.random() + 1) + data?.cards[0].value_int) % 2 === 0;
       setIsReversed(randomReversed);
-      console.log("reversed", isReversed);
 
       const meaning = randomReversed
         ? data.cards[0].meaning_rev
