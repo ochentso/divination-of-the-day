@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { cards } from "./consts";
 import { useEffect, useState } from "react";
-import { format, isBefore, isEqual, isToday, set } from "date-fns";
+import { isToday } from "date-fns";
 import { createPortal } from "react-dom";
 import HintModal from "./components/HintModal";
 import DetailsModal from "./components/DetailsModal";
@@ -14,7 +14,7 @@ const getRandomCard = async () => {
 };
 
 function App() {
-  const { data, error, isFetched, isSuccess, isLoading, refetch } = useQuery({
+  const { data, isFetched, refetch } = useQuery({
     queryKey: ["getRandomCard"],
     queryFn: getRandomCard,
     enabled: false,
@@ -61,24 +61,6 @@ function App() {
       });
     }
   };
-
-  // to test:
-  // 1) ls empty - open app, click -> shuffle, fetch, flip, card+text -> all correctly written in ls
-  // 2) ls not empty, date is today - divination on page load, modal hint on click with no refethcing
-  // 3) ls not empty, date is not today - no divination on page load, shuffle+flip and new divination work as expected
-  // 4) what happens if I open the app at 23:59 and wait for a new day to come?
-  // если в 23:59 уже есть открытая карта, в 12 автоматически не обновится (пока не будет ререндера); но если кликнуть на карту - появится новое предсказание (НО без анимаций - исправить? low prio!)
-  // cases for 23:59:
-  // no divination present
-  // existing opened, click on card deck
-  // existing opened, page reload
-  // existing opened, details opened
-
-  // text animation
-  // flip animation on page load
-  // error handling, loading message
-
-  // в конце пройтись и всё почистить!
 
   const renderDivination = () => {
     return (
@@ -252,12 +234,7 @@ function App() {
               <DetailsModal onClose={() => setIsDetailsOpen(false)} />,
               document.body,
             )}
-          {/* {isLoading && (
-            <p className="text-textMain text-center pt-8">
-              Getting your daily divination...
-            </p>
-          )} */}
-          {/* {isError && <p>Error: {error}</p>} */}
+
           {data && isFlipped && renderDivination()}
           {!data && divinationExists && renderExistingDivination()}
         </div>
