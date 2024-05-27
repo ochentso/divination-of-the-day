@@ -8,3 +8,4 @@ To start the project locally, perform the commands:
 
 Project on [Github Pages](https://ochentso.github.io/divination-of-the-day/)
 
+Stack: Vite, Typescript, React, TailwindCSS, react-query
